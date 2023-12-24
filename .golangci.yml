@@ -1,0 +1,17 @@
+linters:
+  disable-all: true
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - unused
+    - gosec
+    - gci
+    - gocognit
+    - misspell
+    - gocyclo
+    - whitespace
+    - gofmt
