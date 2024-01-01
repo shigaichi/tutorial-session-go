@@ -1,0 +1,110 @@
+{{ define "body" }}
+    <div>
+        <form action="/account/create?confirm" method="post">
+            {{ .csrfField }}
+            <h2>Account Create Page</h2>
+            <table>
+                <tr>
+                    <td>
+                        <label for="name">name</label>
+                    </td>
+                    <td>
+                        <input id="name" name="name" {{ if .errors.Name }}class="error-input"{{ end }} required/>
+                    </td>
+                    {{ with .errors.Name }}
+                        <td class="error-messages">
+                            {{ . }}
+                        </td>
+                    {{ end }}
+                </tr>
+                <tr>
+                    <td>
+                        <label for="email">e-mail</label>
+                    </td>
+                    <td>
+                        <input id="email" name="email" {{ if .errors.Email }}class="error-input"{{ end }} required/>
+                    </td>
+                    {{ with .errors.Email }}
+                        <td class="error-messages">
+                            {{ . }}
+                        </td>
+                    {{ end }}
+                </tr>
+                <tr>
+                    <td>
+                        <label for="password">password</label>
+                    </td>
+                    <td>
+                        <input type="password" id="password"
+                               name="password" {{ if .errors.Password }}class="error-input"{{ end }} required/>
+                    </td>
+                    {{ with .errors.Password }}
+                        <td class="error-messages">
+                            {{ . }}
+                        </td>
+                    {{ end }}
+                </tr>
+                <tr>
+                    <td>
+                        <label for="confirmPassword">password (confirm)</label>
+                    </td>
+                    <td>
+                        <input type="password" id="confirmPassword"
+                               name="confirmPassword" {{ if .errors.ConfirmPassword }}class="error-input"{{ end }} required/>
+                    </td>
+                    {{ with .errors.ConfirmPassword }}
+                        <td class="error-messages">
+                            {{ . }}
+                        </td>
+                    {{ end }}
+                </tr>
+                <tr>
+                    <td>
+                        <label for="birthday">birthday</label>
+                    </td>
+                    <td>
+                        <input type="date" id="birthday" name="birthday"
+                               {{ if .errors.Birthday }}class="error-input"{{ end }} required/>
+                    </td>
+                    {{ with .errors.Birthday }}
+                        <td class="error-messages">
+                            {{ . }}
+                        </td>
+                    {{ end }}
+                </tr>
+                <tr>
+                    <td>
+                        <label for="zip">zip</label>
+                    </td>
+                    <td>
+                        <input id="zip" name="zip" {{ if .errors.Zip }}class="error-input"{{ end }} required/>
+                    </td>
+                    {{ with .errors.Zip }}
+                        <td class="error-messages">
+                            {{ . }}
+                        </td>
+                    {{ end }}
+                </tr>
+                <tr>
+                    <td>
+                        <label for="address">address</label>
+                    </td>
+                    <td>
+                        <input id="address" name="address" {{ if .errors.Address }}class="error-input"{{ end }} required/>
+                    </td>
+                    {{ with .errors.Address }}
+                        <td class="error-messages">
+                            {{ . }}
+                        </td>
+                    {{ end }}
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td><input type="submit" name="confirm" id="confirm" value="confirm"/></td>
+                </tr>
+            </table>
+        </form>
+
+        <a href="/goods">Login page</a>
+    </div>
+{{ end }}

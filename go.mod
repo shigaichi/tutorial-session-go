@@ -5,6 +5,7 @@ go 1.21.3
 require (
 	github.com/cockroachdb/errors v1.11.1
 	github.com/glebarez/sqlite v1.10.0
+	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/csrf v1.7.2
 	github.com/gorilla/handlers v1.5.2
