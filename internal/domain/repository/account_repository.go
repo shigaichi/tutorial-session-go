@@ -10,6 +10,7 @@ import (
 
 type AccountRepository interface {
 	FindByEmail(ctx context.Context, email string) (model.Account, error)
+	Create(ctx context.Context, account model.Account) error
 }
 
 type AccountRepositoryImpl struct {
@@ -30,4 +31,12 @@ func (i AccountRepositoryImpl) FindByEmail(ctx context.Context, email string) (m
 		return model.Account{}, errors.Wrap(err, "failed to find by email")
 	}
 	return a, nil
+}
+
+func (i AccountRepositoryImpl) Create(ctx context.Context, account model.Account) error {
+	err := i.db.WithContext(ctx).Create(&account).Error
+	if err != nil {
+		return errors.Wrap(err, "failed to create account")
+	}
+	return nil
 }

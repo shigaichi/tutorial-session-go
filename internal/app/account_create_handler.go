@@ -1,12 +1,13 @@
 package app
 
 import (
+	"context"
 	"encoding/gob"
-	"errors"
 	"html/template"
 	"net/http"
 	"time"
 
+	"github.com/cockroachdb/errors"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/gorilla/csrf"
 	"github.com/shigaichi/tutorial-session-go/internal/domain/service"
@@ -22,19 +23,19 @@ type AccountCreate interface {
 	FinishCreate(w http.ResponseWriter, r *http.Request)
 }
 
-type AccountCreteHandler struct {
+type AccountCreateHandler struct {
 	as service.AccountService
 }
 
-func NewAccountCreteHandler(as service.AccountService) AccountCreteHandler {
+func NewAccountCreateHandler(as service.AccountService) AccountCreateHandler {
 	gob.Register(AccountCreateForm{})
 
-	return AccountCreteHandler{as: as}
+	return AccountCreateHandler{as: as}
 }
 
 const sessionName = "accountCreateForm"
 
-func (h AccountCreteHandler) ShowCreateForm(w http.ResponseWriter, r *http.Request) {
+func (h AccountCreateHandler) ShowCreateForm(w http.ResponseWriter, r *http.Request) {
 	t := template.Must(template.ParseFiles("templates/layout/template.gohtml", "templates/account/createForm.gohtml", "templates/layout/footer.gohtml"))
 
 	if err := t.Execute(w, map[string]interface{}{csrf.TemplateTag: csrf.TemplateField(r), "title": "Account Create Page"}); err != nil {
@@ -43,7 +44,7 @@ func (h AccountCreteHandler) ShowCreateForm(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-func (h AccountCreteHandler) ConfirmCreate(w http.ResponseWriter, r *http.Request) {
+func (h AccountCreateHandler) ConfirmCreate(w http.ResponseWriter, r *http.Request) {
 	store := middleware.SessionStore
 	session, err := store.Get(r, middleware.SessionName)
 	if err != nil {
@@ -109,21 +110,60 @@ func (h AccountCreteHandler) ConfirmCreate(w http.ResponseWriter, r *http.Reques
 	}
 }
 
-func (h AccountCreteHandler) Update(w http.ResponseWriter, r *http.Request) {
+func (h AccountCreateHandler) Update(w http.ResponseWriter, r *http.Request) {
 	if _, ok := r.Form["redoForm"]; ok {
 		h.ShowCreateForm(w, r)
 		return
 	}
 
-	// TODO: implement create account
+	store := middleware.SessionStore
+	session, err := store.Get(r, middleware.SessionName)
+	if err != nil {
+		h.handleInternalError(w, err)
+		return
+	}
+	f := session.Values[sessionName].(AccountCreateForm)
+
+	err = f.Validate()
+	if err != nil {
+		h.handleInternalError(w, err)
+		return
+	}
+
+	_, err = h.as.Create(context.Background(), f.ToModel(), f.Password)
+	if err != nil {
+		h.handleInternalError(w, err)
+		return
+	}
+
+	session.Values[sessionName] = nil
+	err = session.Save(r, w)
+	if err != nil {
+		h.handleInternalError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, "/account/create?finish", http.StatusFound)
 }
 
-func (h AccountCreteHandler) FinishCreate(w http.ResponseWriter, r *http.Request) {
-	//TODO implement me
-	panic("implement me")
+func (h AccountCreateHandler) FinishCreate(w http.ResponseWriter, r *http.Request) {
+	store := middleware.SessionStore
+	session, err := store.Get(r, middleware.SessionName)
+	if err != nil {
+		h.handleInternalError(w, err)
+		return
+	}
+
+	f := session.Values[sessionName].(AccountCreateForm)
+
+	t := template.Must(template.ParseFiles("templates/layout/template.gohtml", "templates/account/createFinish.gohtml", "templates/layout/footer.gohtml"))
+	if err := t.Execute(w, map[string]interface{}{csrf.TemplateTag: csrf.TemplateField(r), "title": "Item List Page", "accountCreateForm": f}); err != nil {
+		h.handleInternalError(w, err)
+		return
+	}
 }
 
-func (h AccountCreteHandler) handleInternalError(w http.ResponseWriter, err error) {
+func (h AccountCreateHandler) handleInternalError(w http.ResponseWriter, err error) {
 	log.Error("error in account_create_handler", zap.Error(err))
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }

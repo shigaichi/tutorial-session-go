@@ -39,7 +39,7 @@ func startServer() error {
 	ar := repository.NewAccountRepositoryImpl(db)
 	as := service.NewAccountServiceImpl(ar)
 	lh := app.NewLoginHandler(as)
-	ach := app.NewAccountCreteHandler(as)
+	ach := app.NewAccountCreateHandler(as)
 
 	a, err := route.NewInitRoute(lh, ach).InitRouting()
 	if err != nil {

@@ -17,10 +17,10 @@ type Route interface {
 
 type InitRoute struct {
 	lh  app.LoginHandler
-	ach app.AccountCreteHandler
+	ach app.AccountCreateHandler
 }
 
-func NewInitRoute(lh app.LoginHandler, ach app.AccountCreteHandler) InitRoute {
+func NewInitRoute(lh app.LoginHandler, ach app.AccountCreateHandler) InitRoute {
 	return InitRoute{lh: lh, ach: ach}
 }
 
@@ -36,6 +36,7 @@ func (i InitRoute) InitRouting() (*mux.Router, error) {
 	r.HandleFunc("/authenticate", i.lh.AuthenticateHandler).Methods("POST")
 
 	r.HandleFunc("/account/create", i.ach.ConfirmCreate).Methods("POST").Queries("confirm", "")
+	r.HandleFunc("/account/create", i.ach.FinishCreate).Methods("GET").Queries("finish", "")
 	r.HandleFunc("/account/create", i.ach.ShowCreateForm).Methods("GET")
 	r.HandleFunc("/account/create", i.ach.Update).Methods("POST")
 	return r, nil
