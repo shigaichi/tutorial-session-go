@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/shigaichi/tutorial-session-go/internal/app"
 	"github.com/shigaichi/tutorial-session-go/internal/logger"
+	"github.com/shigaichi/tutorial-session-go/internal/middleware"
 )
 
 type Route interface {
@@ -18,10 +19,11 @@ type Route interface {
 type InitRoute struct {
 	lh  app.LoginHandler
 	ach app.AccountCreateHandler
+	gh  app.GoodsHandler
 }
 
-func NewInitRoute(lh app.LoginHandler, ach app.AccountCreateHandler) InitRoute {
-	return InitRoute{lh: lh, ach: ach}
+func NewInitRoute(lh app.LoginHandler, ach app.AccountCreateHandler, gh app.GoodsHandler) InitRoute {
+	return InitRoute{lh: lh, ach: ach, gh: gh}
 }
 
 func (i InitRoute) InitRouting() (*mux.Router, error) {
@@ -39,5 +41,9 @@ func (i InitRoute) InitRouting() (*mux.Router, error) {
 	r.HandleFunc("/account/create", i.ach.FinishCreate).Methods("GET").Queries("finish", "")
 	r.HandleFunc("/account/create", i.ach.ShowCreateForm).Methods("GET")
 	r.HandleFunc("/account/create", i.ach.Update).Methods("POST")
+
+	subRouter := r.PathPrefix("/goods").Subrouter()
+	subRouter.Use(middleware.RequireLogin)
+	subRouter.HandleFunc("", i.gh.ShowGoods)
 	return r, nil
 }

@@ -13,7 +13,7 @@ import (
 	"github.com/shigaichi/tutorial-session-go/internal/domain/repository"
 	"github.com/shigaichi/tutorial-session-go/internal/domain/service"
 	log "github.com/shigaichi/tutorial-session-go/internal/logger"
-	"github.com/shigaichi/tutorial-session-go/internal/migrate"
+	"github.com/shigaichi/tutorial-session-go/internal/orm"
 	"github.com/shigaichi/tutorial-session-go/internal/route"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -31,7 +31,7 @@ func startServer() error {
 	if err != nil {
 		return errors.Wrap(err, "failed to open db")
 	}
-	err = migrate.Migrate(db)
+	err = orm.Migrate(db)
 	if err != nil {
 		return errors.Wrap(err, "failed to migration")
 	}
@@ -41,7 +41,13 @@ func startServer() error {
 	lh := app.NewLoginHandler(as)
 	ach := app.NewAccountCreateHandler(as)
 
-	a, err := route.NewInitRoute(lh, ach).InitRouting()
+	gr := repository.NewGoodsRepositoryImpl(db)
+	cr := repository.NewCategoryRepositoryImpl(db)
+	gs := service.NewGoodsServiceImpl(gr)
+	cs := service.NewCategoryServiceImpl(cr)
+	gh := app.NewGoodsHandler(gs, cs)
+
+	a, err := route.NewInitRoute(lh, ach, gh).InitRouting()
 	if err != nil {
 		return errors.Wrap(err, "failed to init routing")
 	}
