@@ -1,0 +1,72 @@
+{{ define "body"}}
+    {{ $c := .csrfField }}
+
+    <div style="display: inline-flex">
+        welcome&nbsp;&nbsp; <span id="userName">{{ .email }}</span>
+        <form action="/logout" method="post">
+            {{ $c }}
+            <input type="submit" id="logout" value="logout"/>
+        </form>
+        <a href="/account/update">Account Update</a>
+    </div>
+    <br>
+    <br>
+
+    <div>
+        <p>select a category</p>
+
+        <form method="get" action="/goods">
+            <select id="categoryId" name="categoryId">
+                {{ range .categories }}
+                    <option value="{{ .CategoryID }}">{{ .CategoryName }}</option>
+                {{ end }}
+            </select>
+            <input type="submit" id="update" value="update"/>
+        </form>
+        <br/>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+            </tr>
+            {{ range $i, $v := .goods }}
+                <tr>
+                    <td><a href="/goods/{{ $v.GoodsID }}">{{ $v.GoodsName }}</a></td>
+                    <td>{{ $v.Price }}</td>
+                    <td>
+                        <form method="post" action="/goods/addToCart">
+                            {{ $c }}
+                            <input type="text" name="quantity" id="quantity{{ $i }}" value="1"/>
+                            <input type="hidden" name="goodsId" value="{{ $v.GoodsID }}"/>
+                            <input type="submit" id="add{{ $i }}" value="add"/>
+                        </form>
+                    </td>
+                </tr>
+            {{ end }}
+        </table>
+        {{ template "pgnt" .page }}
+    </div>
+
+    <div>
+
+        <a href="/cart">view cart</a>
+        {{/*        <table>*/}}
+        {{/*            <!-- /**/}}
+        {{/*            `@変数`でbeanにアクセスできる。これを利用してセッションを取得している。*/}}
+        {{/*            Access any beans in your application context using SpringEL’s syntax: ${@myBean.doSomething()}*/}}
+        {{/*            https://www.thymeleaf.org/doc/tutorials/3.0/thymeleafspring.html*/}}
+        {{/*            /* -->*/}}
+        {{/*            <tr th:each="cartItem, status : ${@cart.cartItems}" th:object="${cartItem}">*/}}
+        {{/*                <td th:id="|itemName${status.index}|" th:text="*{goods.name}">cartItem.goods.name</td>*/}}
+        {{/*                <td th:id="|itemPrice${status.index}|" th:text="*{goods.price}">cartItem.goods.price</td>*/}}
+        {{/*                <td id="itemQuantity${status.index}" th:text="*{quantity}">cartItem.quantity</td>*/}}
+        {{/*            </tr>*/}}
+        {{/*            <tr>*/}}
+        {{/*                <td>Total</td>*/}}
+        {{/*                <td id="totalPrice" th:text="${@cart.totalAmount}">cart.totalAmount</td>*/}}
+        {{/*                <td></td>*/}}
+        {{/*            </tr>*/}}
+        {{/*        </table>*/}}
+    </div>
+{{ end }}

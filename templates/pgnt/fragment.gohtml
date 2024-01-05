@@ -1,0 +1,31 @@
+{{ define "pgnt" }}
+    <div>
+        {{ if ne .Total 0 }}
+            <ul class="pagination">
+                <li {{ if .IsFirst }}class="disabled"{{ end }}>
+                    <a href="{{ if .IsFirst }}javascript:void(0){{ else }}{{ printf "%s?page=%d&size=%d" .CurrentURL 1 .Size }}{{ end }}">&lt;&lt;</a>
+                </li>
+
+                <li {{ if .IsFirst }}class="disabled"{{ end }}>
+                    <a href="{{ if .IsFirst }}javascript:void(0){{ else }}{{ printf "%s?page=%d&size=%d" .CurrentURL (minus .Page 1) .Size }}{{ end }}">&lt;</a>
+                </li>
+                {{ $page := . }}
+                {{ range $i, $v := sequence . 10 }}
+                    <li {{ if eq $page.Page $v }}class="active"{{ end }}>
+                        <a href="{{ if eq $page.Page $v }}javascript:void(0){{ else }}{{ printf "%s?page=%d&size=%d" $page.CurrentURL . $page.Size }}{{ end }}">{{ $v }}</a>
+                    </li>
+                {{ end }}
+
+
+                <li {{ if .IsLast }}class="disabled"{{ end }}>
+                    <a href="{{ if .IsLast }}javascript:void(0){{ else }}{{ printf "%s?page=%d&size=%d" .CurrentURL (plus .Page 1) .Size }}{{ end }}">&gt;</a>
+                </li>
+
+                <li {{ if .IsLast }}class="disabled"{{ end }}>
+                    <a href="{{ if .IsLast }}javascript:void(0){{ else }}{{ printf "%s?page=%d&size=%d" .CurrentURL .GetTotalPages .Size }}{{ end }}">&gt;&gt;</a>
+                </li>
+
+            </ul>
+        {{ end }}
+    </div>
+{{ end }}

@@ -1,0 +1,34 @@
+{{ define "body" }}
+    <div>
+
+        <h3>Your account has created.</h3>
+        <table>
+            <tr>
+                <td><label for="name">name</label></td>
+                <td id="name">{{ .accountCreateForm.Name }}</td>
+            </tr>
+            <tr>
+                <td><label for="email">e-mail</label></td>
+                <td id="email">{{ .accountCreateForm.Email }}</td>
+            </tr>
+            <tr>
+                <td><label for="password">password</label></td>
+                <td id="password">****</td>
+            </tr>
+            <tr>
+                <td><label for="birthday">birthday</label></td>
+                <td id="birthday">{{ .accountCreateForm.Birthday }}</td>
+            </tr>
+            <tr>
+                <td><label for="zip">zip</label></td>
+                <td id="zip">{{ .accountCreateForm.Zip }}</td>
+            </tr>
+            <tr>
+                <td><label for="address">address</label></td>
+                <td id="address">{{ .accountCreateForm.Address }}</td>
+            </tr>
+        </table>
+
+        <a href="/loginForm">Login page</a>
+    </div>
+{{ end }}
